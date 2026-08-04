@@ -5,7 +5,7 @@ EAPI=8
 
 inherit desktop unpacker xdg
 
-DESCRIPTION="Cisco Packet Tracer 9"
+DESCRIPTION="Cisco Packet Tracer 9.0.0"
 HOMEPAGE="https://www.netacad.com/resources/lab-downloads"
 SRC_URI="CiscoPacketTracer_900_Ubuntu_64bit.deb"
 
@@ -63,10 +63,8 @@ pkg_nofetch() {
 }
 
 src_unpack() {
-	# 1. Unpack arsip utama .deb
 	default
 
-	# 2. Extract data.tar.xz ke subfolder khusus 'deb-data'
 	mkdir -p "${WORKDIR}/deb-data" || die
 	if [[ -f "${WORKDIR}/data.tar.xz" ]]; then
 		einfo "Extracting data.tar.xz payload..."
@@ -76,7 +74,6 @@ src_unpack() {
 		tar -xf "${WORKDIR}/data.tar.gz" -C "${WORKDIR}/deb-data" || die
 	fi
 
-	# 3. Cari dan extract AppImage jika ada
 	local appimage
 	appimage=$(find "${WORKDIR}" -type f -name "*.AppImage" 2>/dev/null | head -n 1)
 
@@ -92,17 +89,26 @@ src_unpack() {
 }
 
 src_install() {
-	# Siapkan direktori tujuan di /opt/pt
 	dodir /opt/pt
 
-	# 1. Salin isi AppImage / Debian payload ke /opt/pt
-	if [[ -d "${WORKDIR}/appimage-extracted/squashfs-root" ]]; then
-		cp -r "${WORKDIR}/appimage-extracted/squashfs-root/"* "${ED}/opt/pt/" || die
+	local src_dir=""
+	if [[ -d "${WORKDIR}/appimage-extracted/squashfs-root/opt/pt" ]]; then
+		src_dir="${WORKDIR}/appimage-extracted/squashfs-root/opt/pt"
+	elif [[ -d "${WORKDIR}/appimage-extracted/squashfs-root" ]]; then
+		src_dir="${WORKDIR}/appimage-extracted/squashfs-root"
 	elif [[ -d "${WORKDIR}/deb-data/opt/pt" ]]; then
-		cp -r "${WORKDIR}/deb-data/opt/pt/"* "${ED}/opt/pt/" || die
+		src_dir="${WORKDIR}/deb-data/opt/pt"
+	else
+		src_dir="${WORKDIR}/deb-data"
 	fi
 
-	# 2. HAPUS file sampah penyebab QA Notice & multilib crash
+	einfo "Installing from ${src_dir} to /opt/pt..."
+	cp -rp "${src_dir}/"* "${ED}/opt/pt/" || die
+
+	if [[ -d "${ED}/opt/pt/opt" ]]; then
+		rm -rf "${ED}/opt/pt/opt"
+	fi
+
 	rm -rf "${ED}/opt/pt/AppRun" \
 	       "${ED}/opt/pt/control.tar.xz" \
 	       "${ED}/opt/pt/data.tar.xz" \
@@ -113,7 +119,6 @@ src_install() {
 	       "${ED}/opt/pt/lib" \
 	       2>/dev/null
 
-	# 3. Ikon mimetype dinamis
 	local icon_path
 	for icon in pka pkt pkz; do
 		icon_path=$(find "${WORKDIR}" -type f -name "${icon}.png" 2>/dev/null | head -n 1)
@@ -122,20 +127,17 @@ src_install() {
 		fi
 	done
 
-	# 4. Pasang file desktop dari folder files/pt9.desktop
 	if [[ -f "${FILESDIR}/pt9.desktop" ]]; then
 		newmenu "${FILESDIR}/pt9.desktop" "${PN}.desktop"
 	elif [[ -f "${FILESDIR}/${PN}-${PV}.desktop" ]]; then
 		newmenu "${FILESDIR}/${PN}-${PV}.desktop" "${PN}.desktop"
 	fi
 
-	# 5. Buat symlink executable ke /usr/bin/packettracer
 	if [[ -f "${ED}/opt/pt/packettracer" ]]; then
 		dosym /opt/pt/packettracer /usr/bin/packettracer
+	elif [[ -f "${ED}/opt/pt/pt-manage.sh" ]]; then
+		dosym /opt/pt/pt-manage.sh /usr/bin/packettracer
 	elif [[ -f "${ED}/opt/pt/bin/PacketTracer" ]]; then
 		dosym /opt/pt/bin/PacketTracer /usr/bin/packettracer
-	elif [[ -f "${ED}/opt/pt/packettracer.exe" ]]; then
-		# Jaga-jaga jika di dalam opt/pt berupa runner script
-		dosym /opt/pt/packettracer.sh /usr/bin/packettracer
 	fi
 }
