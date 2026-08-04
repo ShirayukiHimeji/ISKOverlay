@@ -18,11 +18,7 @@ RESTRICT="fetch mirror strip"
 
 # Basic runtime dependencies required by the AppImage and setup scripts
 RDEPEND="
-	sys-fs/fuse:2
-	dev-libs/glib:2
-	x11-libs/libX11
-	media-libs/alsa-lib
-	sys-libs/zlib
+	sys-fs/fuse:3
 "
 
 QA_PREBUILT="opt/pt/*"
