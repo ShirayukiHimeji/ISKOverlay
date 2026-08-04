@@ -7,7 +7,7 @@
 		<homepage>https://github.com/ShirayukiHimeji/ISKOverlay</homepage>
 		<owner type="person">
 			<email>iwan99263@gmail.com</email>
-			<name>ISK Team (Personal)</name>
+			<name>ISK</name>
 		</owner>
 		<source type="git">https://github.com/ShirayukiHimeji/ISKOverlay.git</source>
 		<source type="git">git+ssh://git@github.com/ShirayukiHimeji/ISKOverlay.git</source>
