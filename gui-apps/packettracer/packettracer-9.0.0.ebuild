@@ -90,7 +90,13 @@ pkg_postinst() {
 }
 
 pkg_postrm() {
-    ewarn "If you forgot to run 'packettracer --pt-deactivate',"
-    ewarn "you may need to remove leftover desktop entries"
-    ewarn "from ~/.local/share/applications or ~/.local/share/icons manually."
+    ewarn ""
+    ewarn "Packet Tracer desktop integration is per-user."
+    ewarn ""
+    ewarn "If menu entries remain after uninstall, remove:"
+    ewarn "  CiscoPacketTracer*.desktop"
+    ewarn "from ~/.local/share/applications/"
+    ewarn ""
+    ewarn "and remove Packet Tracer icons from:"
+    ewarn "  ~/.local/share/icons/"
 }
