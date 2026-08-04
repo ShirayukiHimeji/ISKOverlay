@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE repositories SYSTEM "https://www.gentoo.org/dtd/repositories.dtd">
+<repositories xmlns="" version="1.0">
+	<repo quality="experimental" status="unofficial">
+		<name>xoreos</name>
+		<description lang="en">ISK Overlay</description>
+		<homepage>https://github.com/ShirayukiHimeji/ISKOverlay</homepage>
+		<owner type="project">
+			<email>iwan99263@gmail.com</email>
+			<name>ISK Team (Personal)</name>
+		</owner>
+		<source type="git">https://github.com/ShirayukiHimeji/ISKOverlay.git</source>
+		<source type="git">git+ssh://git@github.com/ShirayukiHimeji/ISKOverlay.git</source>
+		<feed>https://github.com/ShirayukiHimeji/ISKOverlay/commits/main.atom</feed>
+	</repo>
+</repositories>
