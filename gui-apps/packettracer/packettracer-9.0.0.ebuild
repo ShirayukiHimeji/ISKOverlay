@@ -13,7 +13,7 @@ S="${WORKDIR}"
 
 LICENSE="Cisco"
 SLOT="0"
-KEYWORDS="amd64"
+KEYWORDS="~amd64"
 RESTRICT="fetch mirror strip"
 
 # Basic runtime dependencies required by the AppImage and setup scripts
@@ -56,63 +56,41 @@ src_install() {
 		cp -rp "${WORKDIR}/payload/"* "${ED}/opt/pt/" || die
 	fi
 
-	# Grant executable permissions (+x) to all EULA scripts, binaries, and AppImages
+	# Grant executable permissions (+x) to all EULA AppImages
 	chmod -R +x "${ED}/opt/pt"
 
-	# 2. DETECT & INSTALL DESKTOP LAUNCHER
-	local upstream_desktop
-	# Look for an upstream .desktop file inside the extracted package
-	upstream_desktop=$(find "${ED}/opt/pt" -maxdepth 2 -type f -name "*.desktop" | head -n 1)
-
-	if [[ -n "${upstream_desktop}" && -f "${upstream_desktop}" ]]; then
-		einfo "Found upstream desktop file: ${upstream_desktop##*/}"
-		
-		# Patch the Exec path to point to /usr/bin/packettracer
-		sed -i 's|^Exec=.*|Exec=/usr/bin/packettracer %f|g' "${upstream_desktop}"
-		
-		# Install upstream .desktop as packettracer.desktop
-		newmenu "${upstream_desktop}" "${PN}.desktop"
-	elif [[ -f "${FILESDIR}/pt9.desktop" ]]; then
-		einfo "Using custom fallback desktop file from files/packettracer-9.0.0.desktop"
-		newmenu "${FILESDIR}/pt9.desktop" "${PN}.desktop"
-	elif [[ -f "${FILESDIR}/${PN}-${PV}.desktop" ]]; then
-		einfo "Using custom fallback desktop file from files/${PN}-${PV}.desktop"
-		newmenu "${FILESDIR}/${PN}-${PV}.desktop" "${PN}.desktop"
-	fi
-
-	# 3. INSTALL MIME-TYPE ICONS (pka, pkt, pkz)
-	local icon_path
-	for icon in pka pkt pkz; do
-		icon_path=$(find "${ED}/opt/pt" -type f -name "${icon}.png" 2>/dev/null | head -n 1)
-		if [[ -n "${icon_path}" && -f "${icon_path}" ]]; then
-			newicon -s 48x48 -c mimetypes "${icon_path}" "application-x-${icon}.png"
-		fi
-	done
-
-	# 4. CREATE EXECUTABLE SYMLINK
+	# 2. CREATE EXECUTABLE SYMLINK
 	# Prioritize runner/EULA management scripts, then AppImage binaries
-	if [[ -f "${ED}/opt/pt/packettracer" ]]; then
-		dosym /opt/pt/packettracer /usr/bin/packettracer
-	elif [[ -f "${ED}/opt/pt/pt-manage.sh" ]]; then
-		dosym /opt/pt/pt-manage.sh /usr/bin/packettracer
-	else
-		local appimage_file
-		appimage_file=$(find "${ED}/opt/pt" -maxdepth 2 -type f -name "*.AppImage" | head -n 1)
-		if [[ -n "${appimage_file}" ]]; then
-			local rel_path="${appimage_file#${ED}}"
-			dosym "${rel_path}" /usr/bin/packettracer
-		fi
+	if [[ -f "${ED}/opt/pt/packettracer.AppImage" ]]; then
+		dosym /opt/pt/packettracer.AppImage /usr/bin/packettracer
 	fi
+
+
 }
 
 pkg_postinst() {
-	xdg_pkg_postinst
+    xdg_pkg_postinst
 
-	einfo ""
-	einfo "Cisco Packet Tracer 9.0.0 Installation Notes:"
-	einfo "If this is your first launch and you need to accept the EULA or activate:"
-	einfo "You can manually run the TUI activation scripts if required:"
-	einfo "  /opt/pt/tui-eula.sh"
-	einfo "  /opt/pt/tui-activation.sh"
-	einfo ""
+    elog ""
+    elog "Cisco Packet Tracer 9.0.0 Installation Notes:"
+    elog ""
+    elog "First launch:"
+    elog "  packettracer"
+    elog ""
+    elog "If you have already accepted the EULA but the desktop"
+    elog "entry does not appear, run:"
+    elog "  packettracer --pt-deactivate"
+    elog "  packettracer --pt-activate"
+    elog ""
+    elog "If this is your first activation, it is safe to ignore"
+    elog "any errors from '--pt-deactivate'."
+    elog ""
+    elog "Before uninstalling Packet Tracer, run:"
+    elog "  packettracer --pt-deactivate"
+}
+
+pkg_postrm() {
+    ewarn "If you forgot to run 'packettracer --pt-deactivate',"
+    ewarn "you may need to remove leftover desktop entries"
+    ewarn "from ~/.local/share/applications or ~/.local/share/icons manually."
 }
