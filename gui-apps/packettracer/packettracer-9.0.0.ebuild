@@ -13,7 +13,7 @@ S="${WORKDIR}"
 
 LICENSE="Cisco"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="amd64"
 RESTRICT="fetch mirror strip"
 
 RDEPEND="
