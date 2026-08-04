@@ -1,11 +1,11 @@
-# Copyright 2022-2024 Gentoo Authors
+# Copyright 2022-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v3
 
 EAPI=8
 
 inherit desktop unpacker xdg
 
-DESCRIPTION="Cisco's packet tracer"
+DESCRIPTION="Cisco Packet Tracer 9"
 HOMEPAGE="https://www.netacad.com/resources/lab-downloads"
 SRC_URI="CiscoPacketTracer_900_Ubuntu_64bit.deb"
 
@@ -53,48 +53,67 @@ RDEPEND="
 
 QA_PREBUILT="opt/pt/*"
 
-pkg_nofetch(){
+pkg_nofetch() {
 	ewarn "To fetch sources, you need a Cisco account which is"
-	ewarn "available if you're a web-learning student, instructor"
-	ewarn "or you sale Cisco hardware, etc."
-	ewarn "after that, go to https://www.netacad.com/resources/lab-downloads and login with"
-	ewarn "your account, and after that, you should download a file"
-	ewarn "named \"${A}\" then move it to"
-	ewarn "your DISTDIR directory"
-	ewarn "and then, you can proceed with the installation."
+	ewarn "available if you're a web-learning student, instructor,"
+	ewarn "or Cisco partner."
+	ewarn "Login to https://www.netacad.com/resources/lab-downloads,"
+	ewarn "download \"${A}\", place it into your DISTDIR directory,"
+	ewarn "and then rerun emerge."
 }
 
 src_unpack() {
-	# Extract lapisan terluar file .deb (menghasilkan data.tar.xz)
+	# 1. Unpack arsip utama .deb
 	default
 
-	# Extract isi filesystem aplikasi dari data.tar.xz
+	# 2. Extract data.tar.xz ke subfolder khusus 'deb-data'
+	mkdir -p "${WORKDIR}/deb-data" || die
 	if [[ -f "${WORKDIR}/data.tar.xz" ]]; then
 		einfo "Extracting data.tar.xz payload..."
-		tar -xf "${WORKDIR}/data.tar.xz" -C "${WORKDIR}" || die
+		tar -xf "${WORKDIR}/data.tar.xz" -C "${WORKDIR}/deb-data" || die
 	elif [[ -f "${WORKDIR}/data.tar.gz" ]]; then
-		tar -xf "${WORKDIR}/data.tar.gz" -C "${WORKDIR}" || die
+		einfo "Extracting data.tar.gz payload..."
+		tar -xf "${WORKDIR}/data.tar.gz" -C "${WORKDIR}/deb-data" || die
 	fi
 
-	# (Opsional) Jika di dalam data.tar.xz masih ada AppImage lagi
+	# 3. Cari dan extract AppImage jika ada
 	local appimage
 	appimage=$(find "${WORKDIR}" -type f -name "*.AppImage" 2>/dev/null | head -n 1)
+
 	if [[ -n "${appimage}" ]]; then
-		einfo "Extracting internal AppImage..."
-		cd "$(dirname "${appimage}")" || die
+		einfo "Internal AppImage found: ${appimage}"
+		einfo "Extracting AppImage payload..."
+		
+		mkdir -p "${WORKDIR}/appimage-extracted" || die
+		cd "${WORKDIR}/appimage-extracted" || die
 		chmod +x "${appimage}" || die
 		"${appimage}" --appimage-extract >/dev/null || die
-		if [[ -d "squashfs-root" ]]; then
-			cp -r squashfs-root/* "${WORKDIR}/" || die
-		fi
 	fi
 }
 
 src_install() {
-	# Salin struktur direktori ke $ED
-	cp -r . "${ED}" || die
+	# Siapkan direktori tujuan di /opt/pt
+	dodir /opt/pt
 
-	# Cari dan pasang ikon mimetypes secara dinamis jika ditemukan
+	# 1. Salin isi AppImage / Debian payload ke /opt/pt
+	if [[ -d "${WORKDIR}/appimage-extracted/squashfs-root" ]]; then
+		cp -r "${WORKDIR}/appimage-extracted/squashfs-root/"* "${ED}/opt/pt/" || die
+	elif [[ -d "${WORKDIR}/deb-data/opt/pt" ]]; then
+		cp -r "${WORKDIR}/deb-data/opt/pt/"* "${ED}/opt/pt/" || die
+	fi
+
+	# 2. HAPUS file sampah penyebab QA Notice & multilib crash
+	rm -rf "${ED}/opt/pt/AppRun" \
+	       "${ED}/opt/pt/control.tar.xz" \
+	       "${ED}/opt/pt/data.tar.xz" \
+	       "${ED}/opt/pt/debian-binary" \
+	       "${ED}/opt/pt/DEBIAN" \
+	       "${ED}/opt/pt/_gpgorigin" \
+	       "${ED}/opt/pt/usr" \
+	       "${ED}/opt/pt/lib" \
+	       2>/dev/null
+
+	# 3. Ikon mimetype dinamis
 	local icon_path
 	for icon in pka pkt pkz; do
 		icon_path=$(find "${WORKDIR}" -type f -name "${icon}.png" 2>/dev/null | head -n 1)
@@ -103,17 +122,20 @@ src_install() {
 		fi
 	done
 
-	# Pasang file desktop jika ada
-	if [[ -f "${FILESDIR}/${PN}-${PV}.desktop" ]]; then
+	# 4. Pasang file desktop dari folder files/pt9.desktop
+	if [[ -f "${FILESDIR}/pt9.desktop" ]]; then
+		newmenu "${FILESDIR}/pt9.desktop" "${PN}.desktop"
+	elif [[ -f "${FILESDIR}/${PN}-${PV}.desktop" ]]; then
 		newmenu "${FILESDIR}/${PN}-${PV}.desktop" "${PN}.desktop"
-	elif [[ -f "${WORKDIR}/usr/share/applications/packettracer-9.0.0.desktop" ]]; then
-		newmenu "${WORKDIR}/usr/share/applications/packettracer-9.0.0.desktop" "${PN}.desktop"
 	fi
 
-	# Buat symlink executable ke /usr/bin/packettracer jika file opsional terpasang di /opt/pt
+	# 5. Buat symlink executable ke /usr/bin/packettracer
 	if [[ -f "${ED}/opt/pt/packettracer" ]]; then
 		dosym /opt/pt/packettracer /usr/bin/packettracer
 	elif [[ -f "${ED}/opt/pt/bin/PacketTracer" ]]; then
 		dosym /opt/pt/bin/PacketTracer /usr/bin/packettracer
+	elif [[ -f "${ED}/opt/pt/packettracer.exe" ]]; then
+		# Jaga-jaga jika di dalam opt/pt berupa runner script
+		dosym /opt/pt/packettracer.sh /usr/bin/packettracer
 	fi
 }
