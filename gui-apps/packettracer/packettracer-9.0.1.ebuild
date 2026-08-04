@@ -5,9 +5,9 @@ EAPI=8
 
 inherit desktop unpacker xdg
 
-DESCRIPTION="Cisco Packet Tracer 9.0.0"
+DESCRIPTION="Cisco Packet Tracer 9.0.1"
 HOMEPAGE="https://www.netacad.com/resources/lab-downloads"
-SRC_URI="CiscoPacketTracer_900_Ubuntu_64bit.deb"
+SRC_URI="CiscoPacketTracer_901_Ubuntu_64bit.deb"
 
 S="${WORKDIR}"
 
@@ -73,7 +73,7 @@ pkg_postinst() {
     xdg_pkg_postinst
 
     elog ""
-    elog "Cisco Packet Tracer 9.0.0 Installation Notes:"
+    elog "Cisco Packet Tracer 9.0.1 Installation Notes:"
     elog ""
     elog "First launch:"
     elog "  packettracer"
