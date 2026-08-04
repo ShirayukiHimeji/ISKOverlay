@@ -65,27 +65,27 @@ pkg_nofetch(){
 }
 
 src_unpack() {
-	# Extract file .deb
+	# Extract lapisan terluar file .deb (menghasilkan data.tar.xz)
 	default
 
-	# Cari file AppImage di dalam hasil unpack .deb
+	# Extract isi filesystem aplikasi dari data.tar.xz
+	if [[ -f "${WORKDIR}/data.tar.xz" ]]; then
+		einfo "Extracting data.tar.xz payload..."
+		tar -xf "${WORKDIR}/data.tar.xz" -C "${WORKDIR}" || die
+	elif [[ -f "${WORKDIR}/data.tar.gz" ]]; then
+		tar -xf "${WORKDIR}/data.tar.gz" -C "${WORKDIR}" || die
+	fi
+
+	# (Opsional) Jika di dalam data.tar.xz masih ada AppImage lagi
 	local appimage
 	appimage=$(find "${WORKDIR}" -type f -name "*.AppImage" 2>/dev/null | head -n 1)
-
 	if [[ -n "${appimage}" ]]; then
-		einfo "Internal AppImage found: ${appimage}"
-		einfo "Extracting AppImage payload..."
-		
+		einfo "Extracting internal AppImage..."
 		cd "$(dirname "${appimage}")" || die
 		chmod +x "${appimage}" || die
-		
-		# Unpack squashfs dari AppImage
 		"${appimage}" --appimage-extract >/dev/null || die
-		
-		# Salin isi AppImage ke $WORKDIR utama jika squashfs-root terbentuk
 		if [[ -d "squashfs-root" ]]; then
 			cp -r squashfs-root/* "${WORKDIR}/" || die
-			rm -rf squashfs-root
 		fi
 	fi
 }
