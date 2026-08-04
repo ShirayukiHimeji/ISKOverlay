@@ -64,11 +64,56 @@ pkg_nofetch(){
 	ewarn "and then, you can proceed with the installation."
 }
 
-src_install(){
+src_unpack() {
+	# Extract file .deb
+	default
+
+	# Cari file AppImage di dalam hasil unpack .deb
+	local appimage
+	appimage=$(find "${WORKDIR}" -type f -name "*.AppImage" 2>/dev/null | head -n 1)
+
+	if [[ -n "${appimage}" ]]; then
+		einfo "Internal AppImage found: ${appimage}"
+		einfo "Extracting AppImage payload..."
+		
+		cd "$(dirname "${appimage}")" || die
+		chmod +x "${appimage}" || die
+		
+		# Unpack squashfs dari AppImage
+		"${appimage}" --appimage-extract >/dev/null || die
+		
+		# Salin isi AppImage ke $WORKDIR utama jika squashfs-root terbentuk
+		if [[ -d "squashfs-root" ]]; then
+			cp -r squashfs-root/* "${WORKDIR}/" || die
+			rm -rf squashfs-root
+		fi
+	fi
+}
+
+src_install() {
+	# Salin struktur direktori ke $ED
 	cp -r . "${ED}" || die
+
+	# Cari dan pasang ikon mimetypes secara dinamis jika ditemukan
+	local icon_path
 	for icon in pka pkt pkz; do
-		newicon -s 48x48 -c mimetypes opt/pt/art/${icon}.png application-x-${icon}.png
+		icon_path=$(find "${WORKDIR}" -type f -name "${icon}.png" 2>/dev/null | head -n 1)
+		if [[ -n "${icon_path}" && -f "${icon_path}" ]]; then
+			newicon -s 48x48 -c mimetypes "${icon_path}" "application-x-${icon}.png"
+		fi
 	done
-	newmenu "${FILESDIR}/${PN}-${PV}.desktop" "${PN}.desktop"
-	dobin opt/pt/packettracer
+
+	# Pasang file desktop jika ada
+	if [[ -f "${FILESDIR}/${PN}-${PV}.desktop" ]]; then
+		newmenu "${FILESDIR}/${PN}-${PV}.desktop" "${PN}.desktop"
+	elif [[ -f "${WORKDIR}/usr/share/applications/packettracer-9.0.0.desktop" ]]; then
+		newmenu "${WORKDIR}/usr/share/applications/packettracer-9.0.0.desktop" "${PN}.desktop"
+	fi
+
+	# Buat symlink executable ke /usr/bin/packettracer jika file opsional terpasang di /opt/pt
+	if [[ -f "${ED}/opt/pt/packettracer" ]]; then
+		dosym /opt/pt/packettracer /usr/bin/packettracer
+	elif [[ -f "${ED}/opt/pt/bin/PacketTracer" ]]; then
+		dosym /opt/pt/bin/PacketTracer /usr/bin/packettracer
+	fi
 }
