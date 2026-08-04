@@ -127,8 +127,8 @@ src_install() {
 		fi
 	done
 
-	if [[ -f "${FILESDIR}/pt9.desktop" ]]; then
-		newmenu "${FILESDIR}/pt9.desktop" "${PN}.desktop"
+	if [[ -f "${FILESDIR}/packettracer-9.0.0.desktop" ]]; then
+		newmenu "${FILESDIR}/packettracer-9.0.0.desktop" "${PN}.desktop"
 	elif [[ -f "${FILESDIR}/${PN}-${PV}.desktop" ]]; then
 		newmenu "${FILESDIR}/${PN}-${PV}.desktop" "${PN}.desktop"
 	fi
