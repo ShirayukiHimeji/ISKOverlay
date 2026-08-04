@@ -2,10 +2,10 @@
 <!DOCTYPE repositories SYSTEM "https://www.gentoo.org/dtd/repositories.dtd">
 <repositories xmlns="" version="1.0">
 	<repo quality="experimental" status="unofficial">
-		<name>xoreos</name>
+		<name>ISKOverlay</name>
 		<description lang="en">ISK Overlay</description>
 		<homepage>https://github.com/ShirayukiHimeji/ISKOverlay</homepage>
-		<owner type="project">
+		<owner type="person">
 			<email>iwan99263@gmail.com</email>
 			<name>ISK Team (Personal)</name>
 		</owner>
