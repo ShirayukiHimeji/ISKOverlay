@@ -6,11 +6,11 @@ EAPI=8
 
 inherit font
 
-DESCRIPTION="Google Sans font family"
+DESCRIPTION="Times New Roman family"
 HOMEPAGE="https://github.com/ShirayukiHimeji/Myfonts"
 SRC_URI="https://github.com/ShirayukiHimeji/Myfonts/releases/download/20260805/TimesNewRoman.zip -> ${P}.zip"
 
-LICENSE="OFL-1.1"
+LICENSE="mscorefonts"
 SLOT="0"
 KEYWORDS="amd64"
 IUSE=""
