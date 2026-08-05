@@ -18,6 +18,5 @@ BDEPEND="app-arch/unzip"
 
 S="${WORKDIR}"
 
-
 FONT_S="${S}/Google_Sans"
 FONT_SUFFIX="ttf"

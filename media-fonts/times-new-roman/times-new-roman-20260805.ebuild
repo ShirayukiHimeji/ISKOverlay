@@ -19,6 +19,5 @@ BDEPEND="app-arch/unzip"
 
 S="${WORKDIR}"
 
-
 FONT_S="${S}/TimesNewRoman"
 FONT_SUFFIX="ttf"
