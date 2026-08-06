@@ -5,8 +5,8 @@ EAPI=8
 
 inherit font
 
-DESCRIPTION="Google Sans font family"
-HOMEPAGE="https://github.com/ShirayukiHimeji/Myfonts"
+DESCRIPTION="0xProto font family"
+HOMEPAGE="https://github.com/0xType/0xProto"
 UNDER_PV=$(ver_rs 1- '_' ${PV})
 SRC_URI="https://github.com/0xType/0xProto/releases/download/${PV}/0xProto_${UNDER_PV}.zip -> ${P}.zip"
 
