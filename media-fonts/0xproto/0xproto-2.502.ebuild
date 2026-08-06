@@ -19,7 +19,7 @@ BDEPEND="app-arch/unzip"
 
 S="${WORKDIR}/fonts"
 
-FONT_SUFFIX="ttf"
+FONT_SUFFIX="ttf otf woff2"
 
 src_install(){
 	font_src_install
