@@ -17,9 +17,8 @@ IUSE=""
 
 BDEPEND="app-arch/unzip"
 
-S="${WORKDIR}"
+S="${WORKDIR}/fonts"
 
-FONT_S="${S}/fonts"
 FONT_SUFFIX="ttf"
 
 src_install(){
