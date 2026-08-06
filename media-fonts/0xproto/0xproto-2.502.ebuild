@@ -21,3 +21,7 @@ S="${WORKDIR}"
 
 FONT_S="${S}/fonts"
 FONT_SUFFIX="ttf"
+
+src_install(){
+	font_src_install
+}
