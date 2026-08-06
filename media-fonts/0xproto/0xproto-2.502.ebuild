@@ -17,8 +17,11 @@ IUSE=""
 
 BDEPEND="app-arch/unzip"
 
+S="${WORKDIR}"
+
 src_install() {
-    cp -a fonts "${ED}/usr/share/fonts/0xproto" || die
+    insinto /usr/share/fonts/0xproto
+    doins -r fonts/*
 }
 
 pkg_postinst() {
