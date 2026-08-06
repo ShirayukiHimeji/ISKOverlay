@@ -17,10 +17,11 @@ IUSE=""
 
 BDEPEND="app-arch/unzip"
 
-S="${WORKDIR}/fonts"
+S="${WORKDIR}"
 
 FONT_SUFFIX="ttf otf woff2"
 
 src_install(){
+	FONT_S="${S}/fonts"
 	font_src_install
 }
