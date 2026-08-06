@@ -17,11 +17,14 @@ IUSE=""
 
 BDEPEND="app-arch/unzip"
 
-S="${WORKDIR}"
+src_install() {
+    cp -a fonts "${ED}/usr/share/fonts/0xproto" || die
+}
 
-FONT_SUFFIX="ttf otf woff2"
+pkg_postinst() {
+    fc-cache -f >/dev/null 2>&1 || true
+}
 
-src_install(){
-	FONT_S="${S}/fonts"
-	font_src_install
+pkg_postrm() {
+    fc-cache -f >/dev/null 2>&1 || true
 }
