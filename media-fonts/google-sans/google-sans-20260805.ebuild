@@ -6,7 +6,7 @@ EAPI=8
 inherit font
 
 DESCRIPTION="Google Sans font family"
-HOMEPAGE="https://github.com/ShirayukiHimeji/Myfonts"
+HOMEPAGE="https://fonts.google.com/specimen/Google+Sans"
 SRC_URI="https://github.com/ShirayukiHimeji/Myfonts/releases/download/20260805/Google_Sans.zip -> ${P}.zip"
 
 LICENSE="OFL-1.1"
