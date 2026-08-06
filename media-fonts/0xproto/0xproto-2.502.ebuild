@@ -12,7 +12,7 @@ SRC_URI="https://github.com/0xType/0xProto/releases/download/${PV}/0xProto_${UND
 
 LICENSE="OFL-1.1"
 SLOT="0"
-KEYWORDS="amd64"
+KEYWORDS=""
 IUSE=""
 
 BDEPEND="app-arch/unzip"
