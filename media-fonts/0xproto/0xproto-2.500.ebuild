@@ -21,7 +21,8 @@ S="${WORKDIR}"
 
 src_install() {
     insinto /usr/share/fonts/0xproto
-    doins -r __MACOSX/*
+    find . -type f \( -name "*.ttf" -o -name "*.otf" -o -name "*.woff2" \) \
+        ! -path "*/__MACOSX/*" -exec doins {} +
 }
 
 pkg_postinst() {
