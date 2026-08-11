@@ -43,7 +43,7 @@ multilib_src_configure() {
 		-DCMAKE_DISABLE_FIND_PACKAGE_X11=$(usex !X)
 		-DENABLE_NONFREE_KERNELS=$(usex redistributable)
 		-DLATEST_CPP_NEEDED=ON # Seems to be the best option for now
-		-D{GEN{8,9,11},MTL,ARL,LNL,BMG,PTL,CRI,XE3P_HPM_SUPPORT,XE3P_LPG}=OFF
+		-D{GEN{8,9,11},MTL,ARL,LNL,BMG,PTL,CRI,NVL,XE3P_HPM_SUPPORT,XE3P_LPG}=OFF
 	)
 	local CMAKE_BUILD_TYPE="Release"
 	cmake_src_configure
